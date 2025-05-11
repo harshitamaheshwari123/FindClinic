@@ -6,13 +6,16 @@ router.get("/nearby", async (req, res) => {
   const { lat, lng } = req.query;
   const radius = 5000;
 
-  // Updated query to include more hospital-related tags and get more details
+  // Updated query to include more medical facilities and get more details
   const query = `
-    [out:json];
+    [out:json][timeout:25];
     (
       node["amenity"="hospital"](around:${radius},${lat},${lng});
       node["amenity"="clinic"](around:${radius},${lat},${lng});
       node["amenity"="doctors"](around:${radius},${lat},${lng});
+      way["amenity"="hospital"](around:${radius},${lat},${lng});
+      way["amenity"="clinic"](around:${radius},${lat},${lng});
+      way["amenity"="doctors"](around:${radius},${lat},${lng});
     );
     out body;
     >;
@@ -20,26 +23,32 @@ router.get("/nearby", async (req, res) => {
   `;
 
   try {
-    const response = await axios.get(
+    console.log("Fetching hospitals for coordinates:", { lat, lng });
+
+    const response = await axios.post(
       "https://overpass-api.de/api/interpreter",
+      query,
       {
-        params: { data: query },
+        headers: { "Content-Type": "text/plain" },
       }
     );
 
-    // Filter and enhance the data
-    const enhancedData = response.data.elements.map((element) => ({
-      ...element,
-      tags: {
-        ...element.tags,
-        name:
-          element.tags.name ||
-          element.tags["name:en"] ||
-          "Unnamed Medical Facility",
-        type: element.tags.amenity || "medical",
-      },
-    }));
+    // Process and enhance the data
+    const enhancedData = response.data.elements
+      .filter((element) => element.tags && element.tags.amenity)
+      .map((element) => ({
+        ...element,
+        tags: {
+          ...element.tags,
+          name:
+            element.tags.name ||
+            element.tags["name:en"] ||
+            "Unnamed Medical Facility",
+          type: element.tags.amenity || "medical",
+        },
+      }));
 
+    console.log(`Found ${enhancedData.length} medical facilities`);
     res.json(enhancedData);
   } catch (err) {
     console.error("Error fetching data:", err.message);

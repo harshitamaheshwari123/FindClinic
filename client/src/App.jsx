@@ -8,6 +8,8 @@ const styles = {
     margin: "0 auto",
     padding: "20px",
     fontFamily: "Arial, sans-serif",
+    backgroundColor: "#f5f5f5",
+    minHeight: "100vh",
   },
   header: {
     backgroundColor: "#d32f2f",
@@ -50,9 +52,10 @@ const styles = {
     borderRadius: "4px",
     width: "300px",
     outline: "none",
-    transition: "border-color 0.3s ease",
+    transition: "all 0.3s ease",
     "&:focus": {
       borderColor: "#b71c1c",
+      boxShadow: "0 0 0 2px rgba(211, 47, 47, 0.2)",
     },
   },
   button: {
@@ -63,13 +66,26 @@ const styles = {
     border: "none",
     borderRadius: "4px",
     cursor: "pointer",
-    transition: "background-color 0.3s ease",
+    transition: "all 0.3s ease",
     "&:hover": {
       backgroundColor: "#b71c1c",
+      transform: "translateY(-1px)",
+    },
+    "&:active": {
+      transform: "translateY(0)",
     },
   },
   errorMessage: {
     color: "#d32f2f",
+    marginTop: "10px",
+    fontSize: "0.9rem",
+    padding: "10px",
+    backgroundColor: "#ffebee",
+    borderRadius: "4px",
+    display: "inline-block",
+  },
+  loadingMessage: {
+    color: "#666",
     marginTop: "10px",
     fontSize: "0.9rem",
   },
@@ -79,6 +95,7 @@ export default function App() {
   const [city, setCity] = useState("");
   const [pos, setPos] = useState(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -87,9 +104,9 @@ export default function App() {
       return;
     }
     setError("");
+    setLoading(true);
 
     try {
-      // Geocode city name using Nominatim
       const res = await axios.get(
         "https://nominatim.openstreetmap.org/search",
         {
@@ -110,6 +127,8 @@ export default function App() {
     } catch (err) {
       setError("Error finding city location. Please try again.");
       console.error("Error:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -132,11 +151,14 @@ export default function App() {
               onChange={(e) => setCity(e.target.value)}
               style={styles.input}
             />
-            <button type="submit" style={styles.button}>
-              Find Clinics
+            <button type="submit" style={styles.button} disabled={loading}>
+              {loading ? "Searching..." : "Find Clinics"}
             </button>
           </form>
           {error && <p style={styles.errorMessage}>{error}</p>}
+          {loading && (
+            <p style={styles.loadingMessage}>Searching for city location...</p>
+          )}
         </div>
       ) : (
         <ClinicsMap lat={pos.lat} lng={pos.lng} />
