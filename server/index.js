@@ -21,6 +21,8 @@ app.use("/api", clinicsRoute);
 
 const PORT = process.env.PORT || 5002;
 
+
+
 // Add error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);

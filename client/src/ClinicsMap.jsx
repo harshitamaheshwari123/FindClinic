@@ -5,7 +5,8 @@ import axios from "axios";
 import "leaflet/dist/leaflet.css";
 
 // API configuration
-const API_BASE_URL = "http://localhost:5002";
+const API_BASE_URL = "https://findclinic-server.onrender.com";
+
 
 // Create axios instance with default config
 const api = axios.create({
