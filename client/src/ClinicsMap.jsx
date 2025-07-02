@@ -4,11 +4,11 @@ import L from "leaflet";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
 
-// API configuration
+
 const API_BASE_URL = "https://findclinic-server.onrender.com";
 
 
-// Create axios instance with default config
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   timeout: 10000,
@@ -17,7 +17,7 @@ const api = axios.create({
   },
 });
 
-// Create custom hospital icon
+
 const hospitalIcon = new L.Icon({
   iconUrl:
     "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png",
@@ -29,7 +29,6 @@ const hospitalIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Error Boundary Component
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
@@ -87,7 +86,6 @@ export default function ClinicsMap({ lat, lng }) {
   const [error, setError] = useState(null);
   const [mapKey, setMapKey] = useState(0);
 
-  // Test server connection on component mount
   useEffect(() => {
     const testServer = async () => {
       try {
@@ -118,7 +116,7 @@ export default function ClinicsMap({ lat, lng }) {
         console.log("Server response:", response.data);
 
         if (response.data && Array.isArray(response.data)) {
-          // Filter out invalid clinic data
+ 
           const validClinics = response.data.filter((clinic) => {
             if (!clinic) return false;
             if (clinic.type === "node") {
@@ -167,7 +165,7 @@ export default function ClinicsMap({ lat, lng }) {
     }
   }, [lat, lng]);
 
-  // Force map re-render when coordinates change
+
   useEffect(() => {
     setMapKey((prev) => prev + 1);
   }, [lat, lng]);
