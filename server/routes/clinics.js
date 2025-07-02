@@ -6,7 +6,6 @@ router.get("/nearby", async (req, res) => {
   const { lat, lng } = req.query;
   const radius = 5000;
 
-  // Updated query to include more medical facilities and get more details
   const query = `
     [out:json][timeout:25];
     (
@@ -33,7 +32,6 @@ router.get("/nearby", async (req, res) => {
       }
     );
 
-    // Process and enhance the data
     const enhancedData = response.data.elements
       .filter((element) => element.tags && element.tags.amenity)
       .map((element) => ({
